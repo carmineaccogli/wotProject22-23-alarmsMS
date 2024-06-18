@@ -1,9 +1,19 @@
 package it.safesiteguard.ms.alarms_ssguard.messages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import it.safesiteguard.ms.alarms_ssguard.domain.Alert;
 
 import java.time.LocalDateTime;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible=true)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DistanceAlertMessage.class, name = "DISTANCE"),
+        @JsonSubTypes.Type(value = GeneralAlertMessage.class, name = "GENERAL")
+
+})
 public abstract class AlertMessage {
 
 
@@ -12,6 +22,7 @@ public abstract class AlertMessage {
     private Alert.Type type;
 
     private String technologyID;
+
 
     private Alert.Priority priority;
 
@@ -48,4 +59,8 @@ public abstract class AlertMessage {
     public void setPriority(Alert.Priority priority) {
         this.priority = priority;
     }
+
+
 }
+
+
