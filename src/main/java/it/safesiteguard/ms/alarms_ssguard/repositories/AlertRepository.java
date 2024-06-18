@@ -13,8 +13,10 @@ public interface AlertRepository extends MongoRepository<Alert, String> {
 
     List<Alert> findAllByOrderByTimestampDesc();
 
+    @Query("{ 'type' : { '$regex' : ?0, '$options' : 'i' } }")
     List<Alert> findAlertsByTypeOrderByTimestampDesc(String type);
 
+    @Query("{ 'priority' : { '$regex' : ?0, '$options' : 'i' } }")
     List<Alert> findAlertsByPriorityOrderByTimestampDesc(String priority);
 
     List<Alert> findAlertsByTimestampBetween(LocalDateTime start, LocalDateTime end);
