@@ -40,14 +40,15 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
         // aggiornamento statistiche
         if(optPastEntryAlert.isPresent()) {
             DistanceAlert pastEntryAlert = (DistanceAlert) optPastEntryAlert.get();
-            Duration duration = Duration.between(distanceAlert.getTimestamp(), pastEntryAlert.getTimestamp());
+            Duration duration = Duration.between(pastEntryAlert.getTimestamp(), distanceAlert.getTimestamp());
 
             pastEntryAlert.setDuration(duration);
             alertRepository.save(pastEntryAlert);
         }
-        // se non esiste significa che quello arrivato è un messaggio di entry
+        // se non esiste significa che quello arrivato è un messaggio di entry (tramite apposito controllo aggiuntivo
+        // per evitare la presenza di exit alarms privi del corrispettivo entry)
         // memorizzazione nel db con campo durata=null
-        else {
+        else if(!distanceAlert.getPriority().equals(Alert.Priority.COMMUNICATION)) {
             distanceAlert.setDuration(null);
             alertRepository.save(distanceAlert);
         }
