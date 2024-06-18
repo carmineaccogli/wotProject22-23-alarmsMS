@@ -1,10 +1,11 @@
 package it.safesiteguard.ms.alarms_ssguard.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import it.safesiteguard.ms.alarms_ssguard.domain.Alert;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AlertViewDTO {
 
 
@@ -24,6 +25,7 @@ public class AlertViewDTO {
 
     private String machineryID;
 
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = ZeroLongValueFilter.class)
     private long secondsDuration;
     //
 
@@ -103,5 +105,12 @@ public class AlertViewDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public static class ZeroLongValueFilter {
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof Long) && ((Long) obj) == 0L;
+        }
     }
 }
