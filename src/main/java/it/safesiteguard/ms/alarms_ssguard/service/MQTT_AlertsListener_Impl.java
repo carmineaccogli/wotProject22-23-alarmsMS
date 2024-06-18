@@ -1,6 +1,7 @@
 package it.safesiteguard.ms.alarms_ssguard.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.safesiteguard.ms.alarms_ssguard.domain.Alert;
 import it.safesiteguard.ms.alarms_ssguard.domain.DistanceAlert;
 import it.safesiteguard.ms.alarms_ssguard.exceptions.MqttMessageException;
@@ -82,6 +83,7 @@ public class MQTT_AlertsListener_Impl implements MQTT_AlertsListener {
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
             genericAlert = objectMapper.readValue(message, AlertMessage.class);
         }catch(Exception ex) {
             ex.printStackTrace();
