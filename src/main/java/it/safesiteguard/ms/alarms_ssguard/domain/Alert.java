@@ -29,7 +29,7 @@ public abstract class Alert {
     }
 
     public enum Priority {
-        LOW, MID, HIGH
+        COMMUNICATION, WARNING, DANGER
     }
 
 
