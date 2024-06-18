@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  #Servizio del database dell'intera applicazione
+  database:
+    platform: linux/x86_64
+    image: mongo:4.0
+    container_name: mongodb_disposalms
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+    env_file:
+      - .env
+    restart: "no"
+    networks:
+      - my-network
+
+  rabbitmq:
+    build:
+      context: ./
+    hostname: "rabbit"
+    ports:
+      - "5672:5672"  # Porta per le connessioni AMQP
+      - "15672:15672"  # Porta per l'interfaccia di gestione web
+      - "1883:1883"   # Porta per MQTT
+    #command: rabbitmq-plugins enable rabbitmq_stomp rabbitmq_mqtt --online
+    networks:
+      - my-network
+
+  alarmsManagementService:
+    platform: linux/x86_64
+    image: openjdk:17-jdk-alpine
+    container_name: ALARMSSERVICE
+    ports:
+      - "8082:8080"
+      - "8002:8000"
+    expose:
+      - "8002"
+      - "8082"
+    depends_on:
+      - database
+      - rabbitmq
+    networks:
+      - my-network
+    volumes:
+      - ./build/libs/Alarms_SSGuard-0.0.1-SNAPSHOT.jar:/app/app.jar
+    working_dir: /app
+    entrypoint: java -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8003 -jar /app/app.jar
+
+
+
+networks:
+  my-network:
+    driver:
+      "bridge"
+
+volumes:
+  mongodb_data:
