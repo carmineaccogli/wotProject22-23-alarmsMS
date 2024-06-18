@@ -27,7 +27,7 @@ public class MqttConfiguration {
     @Value("${mqtt.auth.password}")
     private String password;
 
-    @Value("${mqtt.topic.machineryAlarms}")
+    @Value("${mqtt.topic.machineriesAlarmsTopic}")
     private String machineriesAlarms_TOPIC;
 
 
@@ -48,6 +48,7 @@ public class MqttConfiguration {
         mqttConnectionOptions.setPassword(password.getBytes());
         mqttConnectionOptions.setCleanStart(true);
 
+
         asyncClient.connect(mqttConnectionOptions);
         return asyncClient;
     }*/
@@ -58,11 +59,14 @@ public class MqttConfiguration {
         MqttConnectionOptions options = new MqttConnectionOptions();
         options.setUserName(username);
         options.setPassword(password.getBytes());
+        options.setServerURIs(new String[] { brokerUrl });
         options.setCleanStart(true);
+        options.setAutomaticReconnect(true);
 
         Mqttv5PahoMessageDrivenChannelAdapter adapter =
-                new Mqttv5PahoMessageDrivenChannelAdapter(options, brokerUrl, clientId, machineriesAlarms_TOPIC);
+                new Mqttv5PahoMessageDrivenChannelAdapter(options, clientId, machineriesAlarms_TOPIC);
         adapter.setOutputChannel(mqttInputChannel());
+        adapter.setQos(1);
 
         return adapter;
     }
