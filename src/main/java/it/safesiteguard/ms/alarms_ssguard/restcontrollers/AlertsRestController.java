@@ -46,10 +46,10 @@ public class AlertsRestController {
     /*
         GET filterByType
      */
-    @RequestMapping(value="", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<AlertViewDTO>> getAlertsByType(@RequestParam(name="type", required = true) String type)  {
+    @RequestMapping(value="/type/{typeName}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AlertViewDTO>> getAlertsByType(@PathVariable("typeName") String typeName)  {
 
-        List<Alert> allAlerts = alertHistoryService.filterAlertsByType(type);
+        List<Alert> allAlerts = alertHistoryService.filterAlertsByType(typeName);
         if(allAlerts.isEmpty())
             return ResponseEntity.noContent().build();
 
@@ -60,10 +60,10 @@ public class AlertsRestController {
     /*
         GET filterByPriority
      */
-    @RequestMapping(value="", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<AlertViewDTO>> getAlertsByPriority(@RequestParam(name="priority", required = true) String priority)  {
+    @RequestMapping(value="/priority/{priorityName}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AlertViewDTO>> getAlertsByPriority(@PathVariable("priorityName") String priorityName)  {
 
-        List<Alert> allAlerts = alertHistoryService.filterAlertsByPriority(priority);
+        List<Alert> allAlerts = alertHistoryService.filterAlertsByPriority(priorityName);
         if(allAlerts.isEmpty())
             return ResponseEntity.noContent().build();
 
@@ -74,10 +74,10 @@ public class AlertsRestController {
     /*
         GET filterByDate
      */
-    @RequestMapping(value="", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<AlertViewDTO>> getAlertsByDate(@RequestParam(name="date", required = true) LocalDate date)  {
+    @RequestMapping(value="/date/{dateToSearch}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AlertViewDTO>> getAlertsByDate(@PathVariable("dateToSearch") LocalDate dateToSearch)  {
 
-        List<Alert> allAlerts = alertHistoryService.filterAlertsByDate(date);
+        List<Alert> allAlerts = alertHistoryService.filterAlertsByDate(dateToSearch);
         if(allAlerts.isEmpty())
             return ResponseEntity.noContent().build();
 
