@@ -10,4 +10,6 @@ public interface ManageAlertsService {
 
     void manageGeneralAlerts(GeneralAlertMessage message);
 
+    void manageDriverAwayAlerts(DistanceAlertMessage message);
+
 }

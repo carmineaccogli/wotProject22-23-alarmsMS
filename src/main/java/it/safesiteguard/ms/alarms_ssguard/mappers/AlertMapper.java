@@ -24,7 +24,9 @@ public class AlertMapper {
         else if(alert instanceof DistanceAlert distanceAlert) {
             alertViewDTO.setMachineryID(distanceAlert.getMachineryID());
             alertViewDTO.setWorkerID(distanceAlert.getWorkerID());
-            alertViewDTO.setSecondsDuration(distanceAlert.getDuration().getSeconds());
+
+            if(distanceAlert.getType().equals(Alert.Type.DISTANCE) && distanceAlert.getDuration() != null)
+                alertViewDTO.setSecondsDuration(distanceAlert.getDuration().getSeconds());
         }
 
         return alertViewDTO;

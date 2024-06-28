@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", visible=true)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = DistanceAlertMessage.class, name = "DISTANCE"),
-        @JsonSubTypes.Type(value = GeneralAlertMessage.class, name = "GENERAL")
+        @JsonSubTypes.Type(value = GeneralAlertMessage.class, name = "GENERAL"),
+        @JsonSubTypes.Type(value = DistanceAlertMessage.class, name = "DRIVER_AWAY")
 
 })
 public abstract class AlertMessage {

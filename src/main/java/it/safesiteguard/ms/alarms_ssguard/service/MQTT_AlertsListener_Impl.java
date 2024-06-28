@@ -90,6 +90,9 @@ public class MQTT_AlertsListener_Impl implements MQTT_AlertsListener {
                 manageAlertsService.manageGeneralAlerts((GeneralAlertMessage) genericAlert);
                 cache.put(genericAlert.getTimestamp(), genericAlert);
                 break;
+            case DRIVER_AWAY:
+                manageAlertsService.manageDriverAwayAlerts((DistanceAlertMessage) genericAlert);
+                break;
             default:
                 logger.error("Alert type {} not available", alertType);
         }

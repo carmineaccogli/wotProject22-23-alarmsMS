@@ -68,4 +68,13 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
         // eventuale gestione statistiche
 
     }
+
+    @Override
+    public void manageDriverAwayAlerts(DistanceAlertMessage message) {
+
+        DistanceAlert distanceAlert = alertMessageMapper.fromDistanceMessageToEntity(message);
+        alertRepository.save(distanceAlert);
+
+        // eventuale gestione statistiche
+    }
 }
