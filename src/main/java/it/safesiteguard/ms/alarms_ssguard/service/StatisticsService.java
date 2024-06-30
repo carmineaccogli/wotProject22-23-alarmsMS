@@ -1,9 +1,6 @@
 package it.safesiteguard.ms.alarms_ssguard.service;
 
-import it.safesiteguard.ms.alarms_ssguard.domain.AnnualStatistics;
-import it.safesiteguard.ms.alarms_ssguard.domain.MonthlyStatistics;
-import it.safesiteguard.ms.alarms_ssguard.domain.Statistics;
-import it.safesiteguard.ms.alarms_ssguard.domain.WeeklyStatistics;
+import it.safesiteguard.ms.alarms_ssguard.domain.*;
 
 public interface StatisticsService {
 
@@ -14,4 +11,7 @@ public interface StatisticsService {
     WeeklyStatistics deriveWeeklyStatistics(int year, int month, int day);
 
     Statistics calculateDailyStatistics(int year, int month, int day);
+
+    void updateStatistics(Alert alert);
+
 }

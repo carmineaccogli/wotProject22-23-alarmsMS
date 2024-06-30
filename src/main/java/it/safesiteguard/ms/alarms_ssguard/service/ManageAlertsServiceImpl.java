@@ -24,6 +24,9 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
     @Autowired
     private AlertRepository alertRepository;
 
+    @Autowired
+    private StatisticsService statisticsService;
+
 
     @Override
     public void manageDistanceAlerts(DistanceAlertMessage message) {
@@ -44,6 +47,9 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
 
             pastEntryAlert.setDuration(duration);
             alertRepository.save(pastEntryAlert);
+
+            // gestione statistiche
+            statisticsService.updateStatistics(pastEntryAlert);
         }
         // se non esiste significa che quello arrivato è un messaggio di entry (tramite apposito controllo aggiuntivo
         // per evitare la presenza di exit alarms privi del corrispettivo entry)
@@ -52,6 +58,7 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
             distanceAlert.setDuration(null);
             alertRepository.save(distanceAlert);
         }
+
 
     }
 
@@ -65,16 +72,21 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
         // memorizzazione nel db
         alertRepository.save(generalAlert);
 
-        // eventuale gestione statistiche
-
+        // gestione statistiche
+        statisticsService.updateStatistics(generalAlert);
     }
 
     @Override
     public void manageDriverAwayAlerts(DistanceAlertMessage message) {
 
-        DistanceAlert distanceAlert = alertMessageMapper.fromDistanceMessageToEntity(message);
-        alertRepository.save(distanceAlert);
+        DistanceAlert driverAwayAlert = alertMessageMapper.fromDistanceMessageToEntity(message);
+        alertRepository.save(driverAwayAlert);
 
-        // eventuale gestione statistiche
+        // gestione statistiche
+        statisticsService.updateStatistics(driverAwayAlert);
     }
+
+
+
+
 }

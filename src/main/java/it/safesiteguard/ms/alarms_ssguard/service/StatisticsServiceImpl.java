@@ -164,6 +164,185 @@ public class StatisticsServiceImpl implements StatisticsService{
         return dailyStats;
     }
 
+    /** FUNZIONE PER L'INIZIALIZZAZIONE DI UN DOCUMENTO VUOTO DI STATISTICHE (per i campi comuni)
+     *
+     *  1. Setting del totale Allarmi a 1
+     *  2. Inserimento della coppia TIPO-1 nel mapping di gestione dei tipi
+     *  3. Controllo se alert è di tipo DISTANCE o DRIVER_AWAY
+     *      3.1 Inserimento delle coppie WORKERID-1 e MACHINERYID-1 nei mapping dei top3 by alarms
+     *      3.2 Controllo se alert è di tipo DISTANCE per poter inizializzare la total duration alla durata di tale allarme
+     *
+     * @param statistics
+     * @param alert
+     */
+    private void createStatsDocument(Statistics statistics, Alert alert) {
+
+        // 1
+        statistics.setTotalAlarms(1);
+
+        // 2
+        Map<String, Integer> numberOfAlarmsByType = new HashMap<>();
+        numberOfAlarmsByType.put(alert.getType().toString(), 1);
+        statistics.setNumberOfAlarmsByType(numberOfAlarmsByType);
+
+        // 3
+        if (alert instanceof DistanceAlert distanceAlert) {
+
+            // 3.1
+            Map<String, Integer> mapWorkersCounter = new HashMap<>();
+            Map<String, Integer> mapMachineriesCounter = new HashMap<>();
+
+            mapWorkersCounter.put(distanceAlert.getWorkerID(), 1);
+            mapMachineriesCounter.put(distanceAlert.getMachineryID(), 1);
+
+            statistics.setTop3WorkersByAlarms(mapWorkersCounter);
+            statistics.setTop3MachineriesByAlarms(mapMachineriesCounter);
+
+            // 3.2
+            if (alert.getType().equals(Alert.Type.DISTANCE))
+                statistics.setTotalDistanceDuration(distanceAlert.getDuration().getSeconds());
+            else
+                statistics.setTotalDistanceDuration(0.0);
+        }
+    }
+
+    /** FUNZIONE PER L'AGGIORNAMENTO DEI VALORI DI UNO STATS DOCUMENT GENERICO (campi comuni)
+     *
+     *  1. Incremento di 1 il numero totale di allarmi
+     *  2. Aggiornamento del map tipo alert-counter: se il tipo è già presente incremento di 1 il contatore, altrimenti
+     *      inserisco la nuova coppia
+     *  3. Controllo se alert è di tipo DISTANCE
+     *      3.1 Aggiorno i mapping WORKER-COUNTER e MACHINERY-COUNTER mantenendo solo le prime 3 entità per entrambi
+     *      3.2 Se il tipo è DISTANCE, aggiorno la total duration sommando il valore di duration di tale alert alla somma precedente
+     *
+     * @param statistics
+     * @param alert
+     */
+    private void updateStatsDocument(Statistics statistics, Alert alert) {
+
+        // 1
+        statistics.setTotalAlarms(statistics.getTotalAlarms() + 1);
+
+        // 2
+        String typeName = alert.getType().toString();
+        Map<String, Integer> numOfAlarmsByType = statistics.getNumberOfAlarmsByType();
+        if(!numOfAlarmsByType.containsKey(typeName))
+            numOfAlarmsByType.put(typeName, 1);
+        else
+            numOfAlarmsByType.put(typeName, numOfAlarmsByType.get(typeName) + 1);
+
+        statistics.setNumberOfAlarmsByType(numOfAlarmsByType);
+
+
+        // 3
+        if(alert instanceof DistanceAlert distanceAlert) {
+
+            // 3.1
+            Map<String, Integer> newTop3WorkersByAlarms = updateAndLimitMapping("workerID", distanceAlert, statistics.getTop3WorkersByAlarms());
+            Map<String, Integer> newTop3MachineriesByAlarms = updateAndLimitMapping("machineryID", distanceAlert, statistics.getTop3MachineriesByAlarms());
+
+            statistics.setTop3WorkersByAlarms(newTop3WorkersByAlarms);
+            statistics.setTop3MachineriesByAlarms(newTop3MachineriesByAlarms);
+
+            // 3.2
+            if (alert.getType().equals(Alert.Type.DISTANCE))
+                statistics.setTotalDistanceDuration(statistics.getTotalDistanceDuration() + distanceAlert.getDuration().getSeconds());
+        }
+    }
+
+
+
+
+
+    public void updateStatistics(Alert alert) {
+        updateYearlyStats(alert);
+        updateMonthlyStats(alert);
+        updateWeeklyStats(alert);
+    }
+
+
+    /**
+     *  1. Individuazione del documento nell'apposita repository
+     *  2. Se il documento non è presente, è necessario crearlo inizializzando i campi e salvarlo
+     *  3. Se il documento è presente, è necessario solo aggiornare i campi in modo opportuno e salvarlo aggiornato
+     * @param alert
+     */
+    private void updateYearlyStats(Alert alert) {
+        // 1
+        Optional<AnnualStatistics> optAnnualStats = annualStatisticsRepository.findByYear(alert.getTimestamp().getYear());
+
+        // 2
+        if(optAnnualStats.isEmpty()) {
+            AnnualStatistics annualStatistics = new AnnualStatistics();
+
+            annualStatistics.setYear(alert.getTimestamp().getYear());
+            createStatsDocument(annualStatistics, alert);
+
+            annualStatisticsRepository.save(annualStatistics);
+            return;
+
+        }
+        // 3
+        AnnualStatistics annualStatistics = optAnnualStats.get();
+        updateStatsDocument(annualStatistics, alert);
+
+        annualStatisticsRepository.save(annualStatistics);
+    }
+
+
+
+    private void updateMonthlyStats(Alert alert) {
+        // 1
+        Optional<MonthlyStatistics> optMonthlyStats = monthlyStatisticsRepository.findByYearAndMonth(alert.getTimestamp().getYear(), alert.getTimestamp().getMonthValue());
+
+        // 2
+        if(optMonthlyStats.isEmpty()) {
+            MonthlyStatistics monthlyStatistics = new MonthlyStatistics();
+
+            monthlyStatistics.setYear(alert.getTimestamp().getYear());
+            monthlyStatistics.setMonth(alert.getTimestamp().getMonthValue());
+            createStatsDocument(monthlyStatistics, alert);
+
+            monthlyStatisticsRepository.save(monthlyStatistics);
+            return;
+
+        }
+        // 3
+        MonthlyStatistics monthlyStatistics = optMonthlyStats.get();
+        updateStatsDocument(monthlyStatistics, alert);
+
+        monthlyStatisticsRepository.save(monthlyStatistics);
+    }
+
+
+    private void updateWeeklyStats(Alert alert) {
+        // 1
+        int week = getWeekOfYear(alert.getTimestamp().getYear(), alert.getTimestamp().getMonthValue(), alert.getTimestamp().getDayOfMonth());
+        Optional<WeeklyStatistics> optWeeklyStats = weeklyStatisticsRepository.findByYearAndWeek(alert.getTimestamp().getYear(), week);
+
+        // 2
+        if(optWeeklyStats.isEmpty()) {
+            WeeklyStatistics weeklyStatistics = new WeeklyStatistics();
+
+            weeklyStatistics.setYear(alert.getTimestamp().getYear());
+            weeklyStatistics.setWeek(week);
+
+            createStatsDocument(weeklyStatistics, alert);
+
+            weeklyStatisticsRepository.save(weeklyStatistics);
+            return;
+
+        }
+        // 3
+        WeeklyStatistics weeklyStatistics = optWeeklyStats.get();
+        updateStatsDocument(weeklyStatistics, alert);
+
+        weeklyStatisticsRepository.save(weeklyStatistics);
+
+    }
+
+
+
 
 
 
@@ -181,6 +360,37 @@ public class StatisticsServiceImpl implements StatisticsService{
         return date.get(weekFields.weekOfWeekBasedYear());
     }
 
+    private Map<String, Integer> updateAndLimitMapping(String field, DistanceAlert distanceAlert, Map<String, Integer> entityCountMap) {
+        updateMapping(field, distanceAlert, entityCountMap);
+        return limitMapping(entityCountMap);
+    }
+
+
+    private void updateMapping(String field, DistanceAlert distanceAlert, Map<String, Integer> entityCountMap) {
+        String key = "";
+        if (field.equals("workerID")) {
+            key = distanceAlert.getWorkerID();
+        } else if (field.equals("machineryID")) {
+            key = distanceAlert.getMachineryID();
+        }
+
+        if (!key.isEmpty()) {
+            entityCountMap.put(key, entityCountMap.getOrDefault(key, 0) + 1);
+        }
+    }
+
+    private Map<String, Integer> limitMapping(Map<String, Integer> entityCountMap) {
+        return entityCountMap.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .limit(3)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+    }
+
 
     private Map<String, Integer> updateTopEntityList(String field, List<Alert> dayAlertsList) {
 
@@ -193,31 +403,12 @@ public class StatisticsServiceImpl implements StatisticsService{
             if(alert.getType().equals(Alert.Type.DISTANCE) || alert.getType().equals(Alert.Type.DRIVER_AWAY)) {
                 DistanceAlert distanceAlert = (DistanceAlert) alert;
 
-                String key = "";
-                if (field.equals("workerID")) {
-                    key = distanceAlert.getWorkerID();
-                } else if (field.equals("machineryID")) {
-                    key = distanceAlert.getMachineryID();
-                }
-
-                if (!key.isEmpty()) {
-                    entityCountMap.put(key, entityCountMap.getOrDefault(key, 0) + 1);
-                }
+                updateMapping(field, distanceAlert, entityCountMap);
             }
         }
 
         // Creazione di un mapping che contiene solo i top 3 elementi per numero di allarmi
-        Map<String, Integer> top3EntitiesMap = entityCountMap.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                .limit(3)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-
-        return top3EntitiesMap;
+        return limitMapping(entityCountMap);
     }
 
 }
