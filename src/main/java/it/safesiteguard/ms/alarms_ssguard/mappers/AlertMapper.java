@@ -16,7 +16,7 @@ public class AlertMapper {
         alertViewDTO.setId(alert.getId());
         alertViewDTO.setType(alert.getType());
         alertViewDTO.setPriority(alert.getPriority());
-        alertViewDTO.setTimestamp(alert.getTimestamp());
+        alertViewDTO.setTimestamp(alert.getTimestamp().toString());
         alertViewDTO.setTechnologyID(alert.getTechnologyID());
 
         if(alert instanceof GeneralAlert)

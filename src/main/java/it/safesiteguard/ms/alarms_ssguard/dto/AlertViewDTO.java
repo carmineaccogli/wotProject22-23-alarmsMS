@@ -11,7 +11,7 @@ public class AlertViewDTO {
 
     private String id;
 
-    private LocalDateTime timestamp;
+    private String timestamp;
 
     private Alert.Type type;
 
@@ -43,11 +43,11 @@ public class AlertViewDTO {
         this.id = id;
     }
 
-    public LocalDateTime getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
