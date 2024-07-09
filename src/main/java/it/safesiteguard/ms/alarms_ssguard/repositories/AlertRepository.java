@@ -1,6 +1,7 @@
 package it.safesiteguard.ms.alarms_ssguard.repositories;
 
 import it.safesiteguard.ms.alarms_ssguard.domain.Alert;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
@@ -23,4 +24,7 @@ public interface AlertRepository extends MongoRepository<Alert, String> {
 
     @Query("{'workerID': ?0, 'machineryID': ?1, 'duration': null, '_class': 'distanceAlert'}")
     Optional<Alert> findFirstByWorkerIDAndMachineryIDAndDurationIsNullOrderByTimestampDesc(String workerID, String machineryID);
+
+    @Query("{ '_class' : 'distanceAlert', 'workerID' : ?0 }")
+    List<Alert> findAlertsByWorkerIDOrderByTimestampDesc(String workerID, Sort sort);
 }

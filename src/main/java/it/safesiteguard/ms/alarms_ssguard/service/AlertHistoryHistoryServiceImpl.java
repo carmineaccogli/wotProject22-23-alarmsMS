@@ -3,6 +3,7 @@ package it.safesiteguard.ms.alarms_ssguard.service;
 import it.safesiteguard.ms.alarms_ssguard.domain.Alert;
 import it.safesiteguard.ms.alarms_ssguard.repositories.AlertRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,5 +34,10 @@ public class AlertHistoryHistoryServiceImpl implements AlertHistoryService {
         return alertRepository.findAlertsByTimestampBetween(startOfDay, endOfDay);
     }
 
+
+    public List<Alert> filterAlertByWorker(String workerID) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "timestamp");
+        return alertRepository.findAlertsByWorkerIDOrderByTimestampDesc(workerID, sort);
+    }
 
 }

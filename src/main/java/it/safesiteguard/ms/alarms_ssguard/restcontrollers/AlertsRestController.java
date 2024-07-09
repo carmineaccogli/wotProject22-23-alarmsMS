@@ -85,6 +85,17 @@ public class AlertsRestController {
         return ResponseEntity.ok(allAlertsDTO);
     }
 
+    @RequestMapping(value="/worker/{workerID}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<AlertViewDTO>> getAlertsByWorker(@PathVariable("workerID") String workerID)  {
+
+        List<Alert> allAlerts = alertHistoryService.filterAlertByWorker(workerID);
+        if(allAlerts.isEmpty())
+            return ResponseEntity.noContent().build();
+
+        List<AlertViewDTO> allAlertsDTO = fromAlertToDTOArray(allAlerts);
+        return ResponseEntity.ok(allAlertsDTO);
+    }
+
 
 
 

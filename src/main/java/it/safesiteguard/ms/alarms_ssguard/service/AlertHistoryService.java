@@ -14,4 +14,6 @@ public interface AlertHistoryService {
     List<Alert> filterAlertsByPriority(String priority);
 
     List<Alert> filterAlertsByDate(LocalDate date);
+
+    List<Alert> filterAlertByWorker(String workerID);
 }
