@@ -38,7 +38,7 @@ public class SecurityConfig {
         http.cors(corsPolicy -> corsConfigurationSource())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests.anyRequest().permitAll())
+                        authorizeRequests.anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .exceptionHandling(exception -> exception.accessDeniedHandler(accessDeniedHandlerJwt))
                 .sessionManagement(sessionManagement ->

@@ -8,6 +8,7 @@ import it.safesiteguard.ms.alarms_ssguard.service.AlertHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -30,6 +31,7 @@ public class AlertsRestController {
     /*
         GET ALL: ritorna la lista di tutti gli alerts ordinati per timestamp decrescente
      */
+    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
     @RequestMapping(value="/", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AlertViewDTO>> getAllAlerts() {
 
@@ -46,6 +48,7 @@ public class AlertsRestController {
     /*
         GET filterByType
      */
+    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
     @RequestMapping(value="/type/{typeName}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AlertViewDTO>> getAlertsByType(@PathVariable("typeName") String typeName)  {
 
@@ -60,6 +63,7 @@ public class AlertsRestController {
     /*
         GET filterByPriority
      */
+    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
     @RequestMapping(value="/priority/{priorityName}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AlertViewDTO>> getAlertsByPriority(@PathVariable("priorityName") String priorityName)  {
 
@@ -74,6 +78,7 @@ public class AlertsRestController {
     /*
         GET filterByDate
      */
+    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
     @RequestMapping(value="/date/{dateToSearch}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AlertViewDTO>> getAlertsByDate(@PathVariable("dateToSearch") LocalDate dateToSearch)  {
 
@@ -85,6 +90,7 @@ public class AlertsRestController {
         return ResponseEntity.ok(allAlertsDTO);
     }
 
+    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
     @RequestMapping(value="/worker/{workerID}", method=RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<AlertViewDTO>> getAlertsByWorker(@PathVariable("workerID") String workerID)  {
 
