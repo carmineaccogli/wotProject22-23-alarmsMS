@@ -35,7 +35,7 @@ public class StatisticsRestController {
     /*
         GET per ottenere le statistiche annuali
      */
-    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_SAFETY_MANAGER')")
     @RequestMapping(value="/{year}", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StatisticsDTO> getAnnualStatistics(@Min(2000) @Max(2025) @PathVariable("year") int year) {
 
@@ -52,7 +52,7 @@ public class StatisticsRestController {
     /*
         GET per ottenere le statistiche mensili
      */
-    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_SAFETY_MANAGER')")
     @RequestMapping(value="/{year}/{month}", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StatisticsDTO> getMonthlyStatistics(@Min(2000) @Max(2025) @PathVariable("year") int year,
                                                               @Min(1) @Max(12) @PathVariable("month") int month) {
@@ -70,7 +70,7 @@ public class StatisticsRestController {
     /*
         GET per ottenere le statistiche giornaliere
      */
-    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_SAFETY_MANAGER')")
     @RequestMapping(value="/{year}/{month}/{day}", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StatisticsDTO> getDailyStatistics(@Min(2000) @Max(2025) @PathVariable("year") int year,
                                                                  @Min(1) @Max(12) @PathVariable("month") int month,
@@ -89,7 +89,7 @@ public class StatisticsRestController {
     /*
         GET per ottenere le statistiche settimanali
      */
-    @PreAuthorize("hasAnyRole('ROLE_Admin','ROLE_Safety_Manager')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_SAFETY_MANAGER')")
     @RequestMapping(value="/{year}/{month}/{day}/week", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<StatisticsDTO> getWeeklyStatistics(@PathVariable("year") int year,
                                                                   @PathVariable("month") int month,
