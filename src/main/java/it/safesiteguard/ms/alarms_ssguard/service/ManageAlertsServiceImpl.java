@@ -42,7 +42,25 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
         // memorizzazione nel db
         // aggiornamento statistiche
         if(optPastEntryAlert.isPresent()) {
+
+            /* Se arriva uno stesso allarme con priorità Warning 2 volte di seguito:
+               1. memorizzare il nuovo allarme con duration null
+               2. eliminare l'allarme precedente in quanto non ha visto una risoluzione
+               3. return
+             */
             DistanceAlert pastEntryAlert = (DistanceAlert) optPastEntryAlert.get();
+
+            if(!distanceAlert.getPriority().equals(Alert.Priority.COMMUNICATION)) {
+
+                // 1
+                distanceAlert.setDuration(null);
+                alertRepository.save(distanceAlert);
+
+                // 2
+                alertRepository.delete(pastEntryAlert);
+            }
+
+
             Duration duration = Duration.between(pastEntryAlert.getTimestamp(), distanceAlert.getTimestamp());
 
             pastEntryAlert.setDuration(duration);
@@ -58,7 +76,6 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
             distanceAlert.setDuration(null);
             alertRepository.save(distanceAlert);
         }
-
 
     }
 
