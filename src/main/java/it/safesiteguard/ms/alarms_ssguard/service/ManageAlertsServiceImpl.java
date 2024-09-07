@@ -58,6 +58,8 @@ public class ManageAlertsServiceImpl implements ManageAlertsService {
 
                 // 2
                 alertRepository.delete(pastEntryAlert);
+
+                return;
             }
 
 
